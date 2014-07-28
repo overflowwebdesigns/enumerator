@@ -1,6 +1,11 @@
 #### Install python Nmap module http://xael.org/norman/python/python-nmap/
 ####
 ####
+####
+####
+#### Usage: ./enumerate.py <ip address>
+####
+####
 
 #!/bin/python
 import sys
@@ -11,9 +16,10 @@ import time
 print "Scanning standby..."
 time.sleep(10)
 print "Still Scanning..."
+
 IP = sys.argv[1] # IP address
-nm = nmap.PortScanner()
-nm.scan(IP, '80,443,22,21')
+nm = nmap.PortScanner() # Initialize Nmap module
+nm.scan(IP, '80,443,22,21') # Target ports
 nm.command_line()
 nm.scaninfo()
 	
