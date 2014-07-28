@@ -2,7 +2,7 @@
 import sys
 import os
 
-IP = sys.argv[1]
+IP = sys.argv[1] # IP address
 init_nmap = 'nmap -T5 -p- -o'+IP+'.txt'+' '+IP
 os.system(init_nmap)
 
