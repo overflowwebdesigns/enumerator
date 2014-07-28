@@ -1,15 +1,36 @@
+#### Install python Nmap module http://xael.org/norman/python/python-nmap/
+####
+####
+
 #!/bin/python
 import sys
 import os
+import nmap
+import time
 
+print "Scanning standby..."
+time.sleep(10)
+print "Still Scanning..."
 IP = sys.argv[1] # IP address
-init_nmap = 'nmap -T5 -p- -o'+IP+'.txt'+' '+IP
-os.system(init_nmap)
-
-port_file = open(IP+'.txt', r)
-ports = port_file.readlines()
-for target in ports:
-	if target == "80 open":
-		print "80 open"
+nm = nmap.PortScanner()
+nm.scan(IP, '80,443,22,21')
+nm.command_line()
+nm.scaninfo()
 	
 
+for host in nm.all_hosts():
+	print('--------------------')
+	print('Host: %s (%s)' % (IP, nm[host].hostname()))
+	print('State: %s' % nm[host].state())
+	print('--------------------')
+
+for proto in nm[host].all_protocols():
+	print('--------------------')
+	print('Protocol: %s' % proto)
+
+lport = nm[host]['tcp'].keys()
+lport.sort()
+for port in lport:
+	print('--------------------')
+	print('port: %s\tstate: %s' % (port, nm[host][proto][port]['state']))
+	print('--------------------')
