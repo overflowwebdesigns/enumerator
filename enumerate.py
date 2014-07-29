@@ -10,9 +10,11 @@
 #!/bin/python
 import sys
 import os
+import subprocess
 import nmap
 import time
 import ftplib
+import shlex
 
 print "Looking for low hanging fruit hang on..."
 time.sleep(20)
@@ -28,7 +30,6 @@ nm.scaninfo()
 ###########################
 def ftp(): # Attempts to login to FTP using anonymous user
 	try:
-		ftp_info = open('/root/Desktop/'+IP+"ftp_info.txt",'w')
 		ftp = ftplib.FTP(IP)
 		ftp.login()
 		print "\o/"
@@ -39,6 +40,18 @@ def ftp(): # Attempts to login to FTP using anonymous user
 	except:
 		print "FTP does not allow anonymous access :("
 ############################
+
+############################
+def dirb(): # Runs dirb on http pages.
+	os.system('xterm -hold -e dirb http://'+IP+' -o /root/Desktop/'+IP+'/dirb_info.txt &')
+	print 'Running Dirb on port 80 - Check the folder for output file.'
+############################
+
+###########################
+def dirb_https(): # Runs dirb on https pages.
+	os.system('xterm -hold -e dirb https://'+IP+' -o /root/Desktop/'+IP+'/dirb_https_info.txt &')
+	print 'Running Dirb on port 443 - Check the folder for output file.'
+###########################
 
 for host in nm.all_hosts():
 	print('--------------------')
@@ -57,11 +70,17 @@ for port in lport:
 	print('port: %s\tstate: %s' % (port, nm[host][proto][port]['state']))
 	print('--------------------')
 
-if nm[host].has_tcp(21):
-		print "*" * 10
-		print "FTP FOUND - CHECKING FOR ANONYMOUS ACCESS"
-		ftp()
-		
+# Function Checks
+if nm[host].has_tcp(21) and nm[IP]['tcp'][21]['state'] == 'open':
+	print "*" * 10
+	print "FTP FOUND - CHECKING FOR ANONYMOUS ACCESS"
+	ftp()
+if nm[host].has_tcp(80) and nm[IP]['tcp'][80]['state'] == 'open':
+	dirb()
+if nm[host].has_tcp(443) and nm[IP]['tcp'][443]['state'] == 'open':
+	dirb_https()
+
+#Nmap Service Scan
 print "#" * 10
 print "Beginning Service Scan of all ports... Your pwnage can begin soon..."
 print "#" * 10
